@@ -1,17 +1,37 @@
 import './App.css';
-import { Stack, Button } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box } from '@mui/material';
+import { Routes, Route } from 'react-router-dom';
+import { getAccessToken } from './utils/getAccessToken';
+import { getAccessTokenFromStorage } from './utils/getAccessTokenFromStorage';
+import Login from './pages/Login';
+import Dashboard from './components/Dashboard/Dashboard';
 
-function App() {
+function App({ spotifyApi }) {
+	const [token, setToken] = useState(getAccessTokenFromStorage());
+
+	useEffect(() => {
+		// setting the accessToken to token from session storage or from the url
+		const accessToken = getAccessTokenFromStorage() || getAccessToken();
+
+		if (accessToken) {
+			setToken(accessToken);
+			sessionStorage.setItem('spotifyToken', accessToken);
+			window.location.hash = '';
+		}
+	}, []);
+
 	return (
-		<div className="App">
-			<h1>Techover Self Made - Spotify</h1>
-			<Stack spacing={2} direction="row">
-				<Button variant="text">Text</Button>
-				<Button variant="contained">Contained</Button>
-				<Button variant="outlined">Outlined</Button>
-			</Stack>
-		</div>
+		<Box className="App">
+			<Dashboard />
+			{token ? (
+				<Dashboard spotifyApi={spotifyApi} />
+			) : (
+				<Routes>
+					<Route path="*" element={<Login />} />
+				</Routes>
+			)}
+		</Box>
 	);
 }
-
 export default App;
