@@ -13,7 +13,7 @@ export const themeOptions = createTheme({
 			paper: '#121212'
 		},
 		text: {
-			priumary: '#ffffff',
+			primary: '#ffffff',
 			secondary: '#b3b3b3'
 		},
 		divider: '#292929'

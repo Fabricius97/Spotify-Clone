@@ -10,7 +10,8 @@ const Home = () => {
 				justifyContent: 'center',
 				alignItems: 'center',
 				flexDirection: 'column',
-				gap: 5
+				gap: 5,
+				background: 'linear-gradient(0deg, #121212 0%, #1bd76030 100%);'
 			}}
 		>
 			<img

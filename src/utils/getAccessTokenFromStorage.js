@@ -1,5 +1,5 @@
 export const getAccessTokenFromStorage = () => {
-	const token = sessionStorage.getItem('spotify_token');
+	const token = sessionStorage.getItem('spotifyToken');
 	if (token !== null) {
 		return token;
 	} else {

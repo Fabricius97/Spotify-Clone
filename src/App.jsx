@@ -23,7 +23,6 @@ function App({ spotifyApi }) {
 
 	return (
 		<Box className="App">
-			<Dashboard />
 			{token ? (
 				<Dashboard spotifyApi={spotifyApi} />
 			) : (
