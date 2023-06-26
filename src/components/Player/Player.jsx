@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Grid, Typography, Avatar } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { getAccessTokenFromStorage } from '../../utils/getAccessTokenFromStorage';
+import PlayerControls from '../PlayerControls/PlayerControls';
+import PlayerVolume from '../PlayerVolume/PlayerVolume';
 
-const Player = ({ spotifyApi, token }) => {
+const Player = ({ spotifyApi }) => {
 	const [localPlayer, setPlayer] = useState(null);
 	const [is_paused, setPaused] = useState(false);
 	const [current_track, setTrack] = useState(null);
@@ -20,7 +21,7 @@ const Player = ({ spotifyApi, token }) => {
 
 		window.onSpotifyWebPlaybackSDKReady = () => {
 			const player = new window.Spotify.Player({
-				name: 'CF Playback',
+				name: 'Techover Playback',
 				getOAuthToken: (cb) => {
 					cb(token);
 				},
@@ -37,7 +38,7 @@ const Player = ({ spotifyApi, token }) => {
 				if (!state || !state.track_window?.current_track) {
 					return;
 				}
-
+				// console.log(state);
 				const duration_ms = state.track_window.current_track.duration_ms / 1000;
 				const position_ms = state.position / 1000;
 				setDuration(duration_ms);
@@ -76,23 +77,34 @@ const Player = ({ spotifyApi, token }) => {
 		transferMyPlayback();
 	}, [device, spotifyApi]);
 
+	// console.log({ current_track });
+
 	return (
 		<Box>
 			<Grid
 				container
 				px={3}
 				sx={{
-					backgroundColor: 'background.paper',
+					bgcolor: 'Background.paper',
 					height: 100,
 					cursor: { xs: 'pointer', md: 'auto' },
 					width: '100%',
 					borderTop: '1px solid #292929'
 				}}
 			>
-				<Grid xs={12} md={4} item sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+				<Grid
+					item
+					xs={12}
+					md={3}
+					sx={{
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'flex-start'
+					}}
+				>
 					<Avatar
 						src={current_track?.album.images[0].url}
-						alt={current_track?.album.name}
+						alt={'#'}
 						variant="square"
 						sx={{ width: 56, height: 56, marginRight: 2 }}
 					/>
@@ -104,14 +116,23 @@ const Player = ({ spotifyApi, token }) => {
 					</Box>
 				</Grid>
 				<Grid
-					sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center', alignItems: 'center' }}
-					md={4}
 					item
+					sx={{
+						display: { xs: 'none', md: 'flex' },
+						flex: 1,
+						justifyContent: { xs: 'flex-end', md: 'center' },
+						alignItems: 'center'
+					}}
 				>
-					player controller
+					<PlayerControls
+						progress={progress}
+						is_paused={is_paused}
+						duration={duration}
+						player={localPlayer}
+					/>
 				</Grid>
-				<Grid xs={6} md={4} item sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-					volume
+				<Grid xs={6} md={4} item sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+					<PlayerVolume player={localPlayer} />
 				</Grid>
 			</Grid>
 		</Box>
