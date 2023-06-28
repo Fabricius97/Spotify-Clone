@@ -13,7 +13,6 @@ const Player = ({ spotifyApi }) => {
 	const [duration, setDuration] = useState(null);
 	const [progress, setProgress] = useState(null);
 	const [playerOverlayIsOpen, setPlayerOverlayIsOpen] = useState(false);
-	const [active, setActive] = useState(false);
 
 	useEffect(() => {
 		const token = getAccessTokenFromStorage();
@@ -47,11 +46,6 @@ const Player = ({ spotifyApi }) => {
 				setProgress(position_ms);
 				setTrack(state.track_window.current_track);
 				setPaused(state.paused);
-
-				if (player && typeof player.getCurrentState === 'function') {
-					const currentState = await player.getCurrentState();
-					setActive(!!currentState);
-				}
 			});
 
 			setPlayer(player);
@@ -134,16 +128,12 @@ const Player = ({ spotifyApi }) => {
 						alignItems: 'center'
 					}}
 				>
-					{active ? (
-						<PlayerControls
-							progress={progress}
-							is_paused={is_paused}
-							duration={duration}
-							player={localPlayer}
-						/>
-					) : (
-						<Box>Please transfer Playback</Box>
-					)}
+					<PlayerControls
+						progress={progress}
+						is_paused={is_paused}
+						duration={duration}
+						player={localPlayer}
+					/>
 				</Grid>
 				<Grid
 					xs={6}
@@ -162,7 +152,6 @@ const Player = ({ spotifyApi }) => {
 				duration={duration}
 				player={localPlayer}
 				current_track={current_track}
-				active={active}
 			/>
 		</Box>
 	);
