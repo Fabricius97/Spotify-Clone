@@ -14,7 +14,7 @@ const SideNav = ({ spotifyApi, token }) => {
 
 			const data = await spotifyApi.getUserPlaylists();
 			setPlaylists(data.body.items);
-			setLoading(false);
+			setLoading(true);
 			console.log(data.body.items);
 		}
 		getPlaylists();
