@@ -6,7 +6,7 @@ import NavPlaylist from '../NavPlaylist/NavPlaylist';
 
 const SideNav = ({ spotifyApi, token }) => {
 	const [playlists, setPlaylists] = useState([]);
-	const [loading, setLoading] = useState();
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		async function getPlaylists() {
