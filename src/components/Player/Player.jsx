@@ -3,6 +3,7 @@ import { Box, Grid, Typography, Avatar } from '@mui/material';
 import { getAccessTokenFromStorage } from '../../utils/getAccessTokenFromStorage';
 import PlayerControls from '../PlayerControls/PlayerControls';
 import PlayerVolume from '../PlayerVolume/PlayerVolume';
+import PlayerOverlay from '../PlayerOverlay/PlayerOverlay';
 
 const Player = ({ spotifyApi }) => {
 	const [localPlayer, setPlayer] = useState(null);
@@ -11,6 +12,8 @@ const Player = ({ spotifyApi }) => {
 	const [device, setDevice] = useState(null);
 	const [duration, setDuration] = useState(null);
 	const [progress, setProgress] = useState(null);
+	const [playerOverlayIsOpen, setPlayerOverlayIsOpen] = useState(false);
+	const [active, setActive] = useState(false);
 
 	useEffect(() => {
 		const token = getAccessTokenFromStorage();
@@ -34,17 +37,21 @@ const Player = ({ spotifyApi }) => {
 				setPlayer(player);
 			});
 
-			player.addListener('player_state_changed', (state) => {
+			player.addListener('player_state_changed', async (state) => {
 				if (!state || !state.track_window?.current_track) {
 					return;
 				}
-				// console.log(state);
 				const duration_ms = state.track_window.current_track.duration_ms / 1000;
 				const position_ms = state.position / 1000;
 				setDuration(duration_ms);
 				setProgress(position_ms);
 				setTrack(state.track_window.current_track);
 				setPaused(state.paused);
+
+				if (player && typeof player.getCurrentState === 'function') {
+					const currentState = await player.getCurrentState();
+					setActive(!!currentState);
+				}
 			});
 
 			setPlayer(player);
@@ -82,6 +89,7 @@ const Player = ({ spotifyApi }) => {
 	return (
 		<Box>
 			<Grid
+				onClick={() => setPlayerOverlayIsOpen((prevState) => !prevState)}
 				container
 				px={3}
 				sx={{
@@ -111,7 +119,9 @@ const Player = ({ spotifyApi }) => {
 					<Box>
 						<Typography sx={{ color: 'text.primary', fontSize: 14 }}>{current_track?.name}</Typography>
 						<Typography sx={{ color: 'text.secondary', fontSize: 12 }}>
-							{current_track?.artists[0].name}
+							{current_track &&
+								current_track.artists.length > 0 &&
+								current_track.artists.map((artist) => artist.name).join(', ')}
 						</Typography>
 					</Box>
 				</Grid>
@@ -124,17 +134,36 @@ const Player = ({ spotifyApi }) => {
 						alignItems: 'center'
 					}}
 				>
-					<PlayerControls
-						progress={progress}
-						is_paused={is_paused}
-						duration={duration}
-						player={localPlayer}
-					/>
+					{active ? (
+						<PlayerControls
+							progress={progress}
+							is_paused={is_paused}
+							duration={duration}
+							player={localPlayer}
+						/>
+					) : (
+						<Box>Please transfer Playback</Box>
+					)}
 				</Grid>
-				<Grid xs={6} md={4} item sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+				<Grid
+					xs={6}
+					md={4}
+					item
+					sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'flex-end' }}
+				>
 					<PlayerVolume player={localPlayer} />
 				</Grid>
 			</Grid>
+			<PlayerOverlay
+				playerOverlayIsOpen={playerOverlayIsOpen}
+				closeOverlay={() => setPlayerOverlayIsOpen(false)}
+				progress={progress}
+				is_paused={is_paused}
+				duration={duration}
+				player={localPlayer}
+				current_track={current_track}
+				active={active}
+			/>
 		</Box>
 	);
 };
