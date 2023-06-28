@@ -1,5 +1,5 @@
 export const authEndpoint = 'http://accounts.spotify.com/authorize';
-export const clientId = '9472f0d0b8134e66b6a8a197a4536eeb';
+export const clientId = import.meta.env.VITE_CLIENT_ID;
 export const liveURL = import.meta.env.VITE_LIVE_URL;
 export const devURL = 'http://localhost:5173/';
 export const redirectURL = liveURL;
